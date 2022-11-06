@@ -101,24 +101,21 @@
 (load-theme 'doom-laserwave t)         ; Awesome Fucking lasers
 
 (use-package xresources-theme)
+;; (load-theme 'xresoures t)
 
-;;; Ewal
-;; (use-package ewal
-;;   :init (setq ewal-use-built-in-always-p nil
-;; 	      ewal-use-built-in-on-failure-p t
-;; 	      ewal-built-in-palette "sexy-material")
-;;   :if (not window-system)
-;;   :config
-;;   (setq-default mode-line-format nil))
-;; 
+(use-package ewal
+  :init (setq ewal-use-built-in-always-p nil
+	      ewal-use-built-in-on-failure-p t
+	      ewal-built-in-palette "sexy-material")
+  :if (not window-system)
+  :config
+  (setq-default mode-line-format nil))
+
 ;; (use-package ewal-spacemacs-themes
 ;;   :if window-system
 ;;   :init (progn
 ;; 	  (show-paren-mode +1)
-;; 	  (global-hl-line-mode))
-;;   :config (progn
-;; 	    (load-theme 'ewal-spacemacs-classic t)
-;; 	    (enable-theme 'ewal-spacemacs-classic)))
+;; 	  (global-hl-line-mode)))
 
 (use-package magit
   :custom (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
