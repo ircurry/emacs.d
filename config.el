@@ -1,8 +1,28 @@
-#+TITLE: Config.org
-#+AUTHOR: Ian Curran
+(setq inhibit-startup-message t)    ;; Starts on blank screen
+(scroll-bar-mode -1)                ;; Disable visible scrollbar
+(tool-bar-mode -1)                  ;; Disable tool bar
+(menu-bar-mode -1)                  ;; Disable menu bar
+(tooltip-mode -1)                   ;; Disable tooltips
+(set-fringe-mode 10)                ;; No idea what this does
 
-* Package Setup
-#+begin_src emacs-lisp
+(add-to-list 'default-frame-alist
+             '(font . "mono-11"))
+
+(set-frame-parameter (selected-frame) 'alpha '(85 . 50))
+  (add-to-list 'default-frame-alist '(alpha . (85 . 50)))
+
+;;Uncomment for no transparency
+ ;; (set-frame-parameter (selected-frame) 'alpha '(100 . 50))
+ ;;  (add-to-list 'default-frame-alist '(alpha . (100 . 50)))
+
+(column-number-mode)
+(global-display-line-numbers-mode t)
+(dolist (mode '(org-mode-hook
+	        term-mode-hook
+		shell-mode-hook
+	        eshell-mode-hook))
+  (add-hook mode (lambda () (display-line-numbers-mode 0))))
+
 (require 'package)
 
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
@@ -19,52 +39,7 @@
 
 (require 'use-package)
 (setq use-package-always-ensure t)
-#+end_src
 
-* Basic UI Configuration
-
-** Basic UI Changes
-#+begin_src emacs-lisp
-(setq inhibit-startup-message t)    ;; Starts on blank screen
-(scroll-bar-mode -1)                ;; Disable visible scrollbar
-(tool-bar-mode -1)                  ;; Disable tool bar
-(menu-bar-mode -1)                  ;; Disable menu bar
-(tooltip-mode -1)                   ;; Disable tooltips
-(set-fringe-mode 10)                ;; No idea what this does
-
-#+end_src
-
-** Fonts
-#+begin_src emacs-lisp
-(add-to-list 'default-frame-alist
-             '(font . "mono-11"))
-#+end_src
-
-** Opacity
-#+begin_src emacs-lisp
-  (set-frame-parameter (selected-frame) 'alpha '(85 . 50))
-   (add-to-list 'default-frame-alist '(alpha . (85 . 50)))
-
- ;;Uncomment for no transparency
-  ;; (set-frame-parameter (selected-frame) 'alpha '(100 . 50))
-  ;;  (add-to-list 'default-frame-alist '(alpha . (100 . 50)))
-#+end_src
-
-** Line Numbers
-#+begin_src emacs-lisp
-(column-number-mode)
-(global-display-line-numbers-mode t)
-(dolist (mode '(org-mode-hook
-	        term-mode-hook
-		shell-mode-hook
-	        eshell-mode-hook))
-  (add-hook mode (lambda () (display-line-numbers-mode 0))))
-#+end_src
-
-* Ivy & Friends
-
-** Ivy
-#+begin_src emacs-lisp
 (use-package ivy
   :diminish
   :bind (("C-s" . swiper)
@@ -82,39 +57,25 @@
          ("C-d" . ivy-reverse-i-search-kill))
   :config
   (ivy-mode 1))
-#+end_src
 
-** Ivy Rich
-#+begin_src emacs-lisp
 (use-package ivy-rich
   :init
   (ivy-rich-mode 1))
-#+end_src
 
-** Councel
-#+begin_src emacs-lisp
 (use-package counsel
   :bind (("M-x" . counsel-M-x)
          ("C-x b" . counsel-ibuffer)
          ("C-x C-f" . counsel-find-file)
          :map minibuffer-local-map
          ("C-r" . 'counsel-minibuffer-history)))
-#+end_src
 
-* Better Help
-
-** Which-Key
-#+begin_src emacs-lisp
 (use-package which-key
   :ensure t
   :init (which-key-mode)
   :diminish which-key-mode
   :config
   (setq which-key-idle-delay 3))
-#+end_src
 
-** Helpful
-#+begin_src emacs-lisp
 (use-package helpful
   :custom
   (counsel-describe-function-function #'helpful-callable)
@@ -124,10 +85,7 @@
   ([remap describe-command] . helpful-command)
   ([remap describe-variable] . counsel-describe-variable)
   ([remap describe-key] . helpful-key))
-#+end_src
 
-* Doom Modeline
-#+begin_src emacs-lisp
 ;; note that you need to run M-x all-the-icons-install-fonts when first installed
 (use-package all-the-icons)
   
@@ -136,27 +94,14 @@
   :init (doom-modeline-mode 1)
   :config (display-battery-mode 1)
   :custom (doom-modline-height 10))
-#+end_src
 
-* Themes
+(use-package doom-themes)
+(use-package cyberpunk-theme)
+(use-package catppuccin-theme)
+(load-theme 'doom-laserwave t)         ; Awesome Fucking lasers
 
-** General Themes
-#+begin_src emacs-lisp
-  (use-package doom-themes)
-  (use-package cyberpunk-theme)
-  (use-package catppuccin-theme)
-  (load-theme 'doom-laserwave t)         ; Awesome Fucking lasers
-#+end_src
+(use-package xresources-theme)
 
-** Xresource based
-
-*** Xresources-Theme
-#+begin_src emacs-lisp
-  (use-package xresources-theme)
-#+end_src
-
-*** Ewal
-#+begin_src emacs-lisp
 ;;; Ewal
 ;; (use-package ewal
 ;;   :init (setq ewal-use-built-in-always-p nil
@@ -174,19 +119,10 @@
 ;;   :config (progn
 ;; 	    (load-theme 'ewal-spacemacs-classic t)
 ;; 	    (enable-theme 'ewal-spacemacs-classic)))
-#+end_src
 
-* Magit
-Emacs, no life,  is worthless without Magit.
-#+begin_src emacs-lisp
 (use-package magit
   :custom (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
-#+end_src
 
-* Better Keybindings
-
-** General
-#+begin_src emacs-lisp
 (use-package general
   :config
   (general-evil-setup t)
@@ -196,22 +132,13 @@ Emacs, no life,  is worthless without Magit.
     :prefix "SPC"
     :global-prefix "C-SPC"))
 
-#+end_src
-
-** Defining SPC
-#+begin_src emacs-lisp
 (cur/leader-keys
   "t"   '(:ignore t :which-key "toggles")
   "tt"  '(counsel-load-theme :which-key "choose theme")
   "w"   '(:ignore t :which-key "windows")
   "wb"  '(kill-some-buffers :which-key "kill multiple buffers")
   "RET" '(vterm :which-key "vterm-other-window"))
-#+end_src
 
-** Evil-Mode
-
-*** Evil Hook
-#+begin_src emacs-lisp
 (defun cur/evil-hook ()
   (dolist (mode '(custom-mode
                   eshell-mode
@@ -223,42 +150,33 @@ Emacs, no life,  is worthless without Magit.
                   sauron-mode
                   term-mode))
    (add-to-list 'evil-emacs-state-modes mode)))
-#+end_src
 
-*** Evil Mode
-#+begin_src emacs-lisp
-  (use-package evil
-    :init 
-    (setq evil-want-integration t)
-    (setq evil-want-keybinding nil)
-    (setq evil-want-C-u-scroll t)
-    (setq evil-want-C-i-jump nil)
-    :hook (evil-mode . cur/evil-hook)
-    :config
-    (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
-    (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join) 
-  
-    ;; Use visual line motions even outside of visual-line-mode buffers
-    (evil-global-set-key 'motion "j" 'evil-next-visual-line)
-    (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+(use-package evil
+  :init 
+  (setq evil-want-integration t)
+  (setq evil-want-keybinding nil)
+  (setq evil-want-C-u-scroll t)
+  (setq evil-want-C-i-jump nil)
+  :hook (evil-mode . cur/evil-hook)
+  :config
+  (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+  (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join) 
 
-    (evil-set-initial-state 'messages-buffer-mode 'normal)
-    (evil-set-initial-state 'dashboard-mode 'normal))
+  ;; Use visual line motions even outside of visual-line-mode buffers
+  (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+  (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
 
-  ;; Won't enable properly in :config :(
-  (evil-mode 1)
-#+end_src
+  (evil-set-initial-state 'messages-buffer-mode 'normal)
+  (evil-set-initial-state 'dashboard-mode 'normal))
 
-*** Evil Collection
-#+begin_src emacs-lisp
+;; Won't enable properly in :config :(
+(evil-mode 1)
+
 (use-package evil-collection
   :after evil
   :config
   (evil-collection-init))
-#+end_src
 
-** Hydra and Key repetition
-#+begin_src emacs-lisp
 (use-package hydra)
 
 (defhydra hydra-text-scale (:timeout 4)
@@ -268,10 +186,7 @@ Emacs, no life,  is worthless without Magit.
   ("f" nil "finished" :exit t))
 (cur/leader-keys
   "ts" '(hydra-text-scale/body :which-key "scale-text"))
-#+end_src
 
-* Projectile
-#+begin_src emacs-lisp
 (use-package projectile
   :diminish projectile-mode
   :config (projectile-mode)
@@ -287,14 +202,7 @@ Emacs, no life,  is worthless without Magit.
  :after projectile
  :config
  (counsel-projectile-mode 1))
-#+end_src
 
-* Org-Mode
-
-** Org Basics
-
-*** Org-Setup-Hooks
-#+begin_src emacs-lisp
 (defun efs/org-mode-setup ()
   (org-indent-mode)
   (variable-pitch-mode 1)
@@ -326,10 +234,7 @@ Emacs, no life,  is worthless without Magit.
   (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
   (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
   (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
-#+end_src
 
-*** Org
-#+begin_src emacs-lisp
 (use-package org
   :hook (org-mode . efs/org-mode-setup)
   :config
@@ -348,10 +253,7 @@ Emacs, no life,  is worthless without Magit.
   (setq org-log-into-drawer t)
 
   (efs/org-font-setup))
-#+end_src
 
-*** Org-Bullets
-#+begin_src emacs-lisp
 (use-package org-bullets
   :after org
   :hook (org-mode . org-bullets-mode)
@@ -362,10 +264,6 @@ Emacs, no life,  is worthless without Magit.
   (setq visual-fill-column-width 100
         visual-fill-column-center-text t)
   (visual-fill-column-mode 1))
-#+end_src
-
-*** Visual Fill
-#+begin_src emacs-lisp
 
 (defun efs/org-mode-visual-fill ()
   (setq visual-fill-column-width 100
@@ -374,55 +272,33 @@ Emacs, no life,  is worthless without Magit.
 
 (use-package visual-fill-column
   :hook (org-mode . efs/org-mode-visual-fill))
-#+end_src
 
-*** Org Tempo
-#+begin_src emacs-lisp
 (require 'org-tempo)
 
 (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
 (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
 (add-to-list 'org-structure-template-alist '("py" . "src python"))
-#+end_src
 
-* Terminal Modes
-
-** Vterm
-#+begin_src emacs-lisp
 (use-package vterm
   :commands vterm
   :config
   (setq term-prompt-regexp "^[^#$%>\n]*[#$%>] *")
   ;;(setq vterm-shell "zsh")
   (setq vterm-max-scrollback 10000))
-#+end_src
 
-* IDE Stuff
-
-** Basic Settings
-#+begin_src emacs-lisp
 (setq sh-basic-offset 8)
 (setq sh-indentation 8)
 (setq-default c-basic-offset 8)
-#+end_src
 
-** LSP
-#+begin_src emacs-lisp
 (use-package lsp-mode
   :commands (lsp lsp-deferred)
   :init
   (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
   :config
   (lsp-enable-which-key-integration t))
-#+end_src
 
-** Rust
-#+begin_src emacs-lisp
 (use-package rust-mode)
-#+end_src
 
-* Updates
-#+begin_src emacs-lisp
 (use-package auto-package-update
   :custom
   (auto-package-update-interval 7)
@@ -431,5 +307,3 @@ Emacs, no life,  is worthless without Magit.
   :config
   (auto-package-update-maybe)
   (auto-package-update-at-time "09:00"))
-#+end_src
-
