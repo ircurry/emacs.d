@@ -20,3 +20,6 @@ Here are a list of features I would like to implement:
 - [ ] Better Projectile Setup
 - [ ] Org Expansion
   - [ ] Org-Roam
+  - [ ] Org-Capture Templates
+  - [ ] Better Org-Agenda
+- [ ] Better README
