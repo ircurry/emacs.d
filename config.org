@@ -56,6 +56,7 @@
 (global-display-line-numbers-mode t)
 (dolist (mode '(org-mode-hook
 	        term-mode-hook
+	        vterm-mode-hook
 		shell-mode-hook
 	        eshell-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
@@ -145,7 +146,9 @@
   (use-package doom-themes)
   (use-package cyberpunk-theme)
   (use-package catppuccin-theme)
-  (load-theme 'doom-laserwave t)         ; Awesome Fucking lasers
+  ;; (load-theme 'doom-laserwave t)         ; Awesome Fucking lasers
+  ;; (load-theme 'everblush t)
+  ;; (load-theme 'ewal-spacemacs-classic t)
 #+end_src
 
 ** Xresource based
@@ -153,24 +156,24 @@
 *** Xresources-Theme
 #+begin_src emacs-lisp
   (use-package xresources-theme)
-  ;; (load-theme 'xresoures t)
+  (load-theme 'xresources t)
 #+end_src
 
 *** Ewal
 #+begin_src emacs-lisp
-(use-package ewal
-  :init (setq ewal-use-built-in-always-p nil
-	      ewal-use-built-in-on-failure-p t
-	      ewal-built-in-palette "sexy-material")
-  :if (not window-system)
-  :config
-  (setq-default mode-line-format nil))
+    (use-package ewal
+      :init (setq ewal-use-built-in-always-p nil
+                  ewal-use-built-in-on-failure-p t
+                  ewal-built-in-palette "sexy-material")
+      :if (not window-system)
+      :config
+      (setq-default mode-line-format nil))
 
-;; (use-package ewal-spacemacs-themes
-;;   :if window-system
-;;   :init (progn
-;; 	  (show-paren-mode +1)
-;; 	  (global-hl-line-mode)))
+    (use-package ewal-spacemacs-themes
+        :if window-system
+        :init (progn
+                (show-paren-mode +1)
+                (global-hl-line-mode)))
 #+end_src
 
 * Magit
@@ -187,22 +190,24 @@ Emacs, no life,  is worthless without Magit.
 (use-package general
   :config
   (general-evil-setup t)
-
-  (general-create-definer cur/leader-keys
-    :keymaps '(normal insert visual emacs)
-    :prefix "SPC"
-    :global-prefix "C-SPC"))
-
 #+end_src
 
 ** Defining SPC
 #+begin_src emacs-lisp
-(cur/leader-keys
-  "t"   '(:ignore t :which-key "toggles")
-  "tt"  '(counsel-load-theme :which-key "choose theme")
-  "w"   '(:ignore t :which-key "windows")
-  "wb"  '(kill-some-buffers :which-key "kill multiple buffers")
-  "RET" '(vterm :which-key "vterm-other-window"))
+    (general-create-definer cur/leader-keys
+      :keymaps '(normal insert visual emacs)
+      :prefix "SPC"
+      :global-prefix "C-SPC"))
+
+  (cur/leader-keys
+    "t"   '(:ignore t :which-key "toggles")
+    "tt"  '(counsel-load-theme :which-key "choose theme")
+    "w"   '(:ignore t :which-key "windows")
+    "b"   '(:ignore t :which-key "buffers")
+    "bs"  '(kill-some-buffers :which-key "kill multiple buffers")
+    "g"   '(magit-status :which-key "magit")
+    "f"   '(counsel-find-file :which-key "find or make file")
+    "RET" '(vterm :which-key "vterm-other-window"))
 #+end_src
 
 ** Evil-Mode
@@ -269,21 +274,25 @@ Emacs, no life,  is worthless without Magit.
 
 * Projectile
 #+begin_src emacs-lisp
-(use-package projectile
-  :diminish projectile-mode
-  :config (projectile-mode)
-  :custom ((projectile-completion-system 'ivy))
-  :bind-keymap
-  ("C-c p" . projectile-command-map)
-  :init
-  (when (file-directory-p "~/proj/code")
-    (setq projectile-project-search-path '("~/proj/code" "~/proj/case")))
-  (setq projectile-switch-project-action #'projectile-dired))
+  (use-package projectile
+    :diminish projectile-mode
+    :config (projectile-mode)
+    :custom ((projectile-completion-system 'ivy))
+    :bind-keymap
+    ("C-c p" . projectile-command-map)
+    :init
+    (when (file-directory-p "~/proj/code")
+      (setq projectile-project-search-path '("~/proj/code" "~/proj/case")))
+    (setq projectile-switch-project-action #'projectile-dired))
+  (cur/leader-keys
+    "p"  '(:ignore t :which-key "projectile")
+    "pp" '(projectile-dired :which-key "open project in dired")
+    "pf" '(projectile-switch-project :which-key "open project in dired"))
 
-(use-package counsel-projectile
- :after projectile
- :config
- (counsel-projectile-mode 1))
+  (use-package counsel-projectile
+   :after projectile
+   :config
+   (counsel-projectile-mode 1))
 #+end_src
 
 * Org-Mode
@@ -316,7 +325,9 @@ Emacs, no life,  is worthless without Magit.
     (set-face-attribute (car face) nil :font "DejaVu Sans" :weight 'regular :height (cdr face)))
 
   ;; Ensure that anything that should be fixed-pitch in Org files appears that way
-  (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-block nil :foreground nil :background "#232221" :inherit 'fixed-pitch)
+  (set-face-attribute 'org-block-begin-line nil :foreground nil :background "#232221" :inherit 'fixed-pitch)
+  (set-face-attribute 'org-block-end-line nil :foreground nil :background "#232221" :inherit 'fixed-pitch)
   (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
   (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
   (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
@@ -354,11 +365,6 @@ Emacs, no life,  is worthless without Magit.
   :hook (org-mode . org-bullets-mode)
   :custom
   (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
-
-(defun efs/org-mode-visual-fill ()
-  (setq visual-fill-column-width 100
-        visual-fill-column-center-text t)
-  (visual-fill-column-mode 1))
 #+end_src
 
 *** Visual Fill
@@ -386,12 +392,12 @@ Emacs, no life,  is worthless without Magit.
 
 ** Vterm
 #+begin_src emacs-lisp
-(use-package vterm
-  :commands vterm
-  :config
-  (setq term-prompt-regexp "^[^#$%>\n]*[#$%>] *")
-  ;;(setq vterm-shell "zsh")
-  (setq vterm-max-scrollback 10000))
+    (use-package vterm
+      :commands vterm
+      :config
+      (setq term-prompt-regexp "^[^#$%>\n]*[#$%>] *")
+      ;;(setq vterm-shell "zsh")
+      (setq vterm-max-scrollback 10000))
 #+end_src
 
 * IDE Stuff

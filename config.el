@@ -36,6 +36,7 @@
 (global-display-line-numbers-mode t)
 (dolist (mode '(org-mode-hook
 	        term-mode-hook
+	        vterm-mode-hook
 		shell-mode-hook
 	        eshell-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
@@ -98,24 +99,26 @@
 (use-package doom-themes)
 (use-package cyberpunk-theme)
 (use-package catppuccin-theme)
-(load-theme 'doom-laserwave t)         ; Awesome Fucking lasers
+;; (load-theme 'doom-laserwave t)         ; Awesome Fucking lasers
+;; (load-theme 'everblush t)
+;; (load-theme 'ewal-spacemacs-classic t)
 
 (use-package xresources-theme)
-;; (load-theme 'xresoures t)
+(load-theme 'xresources t)
 
 (use-package ewal
   :init (setq ewal-use-built-in-always-p nil
-	      ewal-use-built-in-on-failure-p t
-	      ewal-built-in-palette "sexy-material")
+              ewal-use-built-in-on-failure-p t
+              ewal-built-in-palette "sexy-material")
   :if (not window-system)
   :config
   (setq-default mode-line-format nil))
 
-;; (use-package ewal-spacemacs-themes
-;;   :if window-system
-;;   :init (progn
-;; 	  (show-paren-mode +1)
-;; 	  (global-hl-line-mode)))
+(use-package ewal-spacemacs-themes
+    :if window-system
+    :init (progn
+            (show-paren-mode +1)
+            (global-hl-line-mode)))
 
 (use-package magit
   :custom (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
@@ -124,7 +127,7 @@
   :config
   (general-evil-setup t)
 
-  (general-create-definer cur/leader-keys
+(general-create-definer cur/leader-keys
     :keymaps '(normal insert visual emacs)
     :prefix "SPC"
     :global-prefix "C-SPC"))
@@ -133,7 +136,10 @@
   "t"   '(:ignore t :which-key "toggles")
   "tt"  '(counsel-load-theme :which-key "choose theme")
   "w"   '(:ignore t :which-key "windows")
-  "wb"  '(kill-some-buffers :which-key "kill multiple buffers")
+  "b"   '(:ignore t :which-key "buffers")
+  "bs"  '(kill-some-buffers :which-key "kill multiple buffers")
+  "g"   '(magit-status :which-key "magit")
+  "f"   '(counsel-find-file :which-key "find or make file")
   "RET" '(vterm :which-key "vterm-other-window"))
 
 (defun cur/evil-hook ()
@@ -194,6 +200,10 @@
   (when (file-directory-p "~/proj/code")
     (setq projectile-project-search-path '("~/proj/code" "~/proj/case")))
   (setq projectile-switch-project-action #'projectile-dired))
+(cur/leader-keys
+  "p"  '(:ignore t :which-key "projectile")
+  "pp" '(projectile-dired :which-key "open project in dired")
+  "pf" '(projectile-switch-project :which-key "open project in dired"))
 
 (use-package counsel-projectile
  :after projectile
@@ -224,7 +234,9 @@
     (set-face-attribute (car face) nil :font "DejaVu Sans" :weight 'regular :height (cdr face)))
 
   ;; Ensure that anything that should be fixed-pitch in Org files appears that way
-  (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-block nil :foreground nil :background "#232221" :inherit 'fixed-pitch)
+  (set-face-attribute 'org-block-begin-line nil :foreground nil :background "#232221" :inherit 'fixed-pitch)
+  (set-face-attribute 'org-block-end-line nil :foreground nil :background "#232221" :inherit 'fixed-pitch)
   (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
   (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
   (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
@@ -256,11 +268,6 @@
   :hook (org-mode . org-bullets-mode)
   :custom
   (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
-
-(defun efs/org-mode-visual-fill ()
-  (setq visual-fill-column-width 100
-        visual-fill-column-center-text t)
-  (visual-fill-column-mode 1))
 
 (defun efs/org-mode-visual-fill ()
   (setq visual-fill-column-width 100
