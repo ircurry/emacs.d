@@ -29,16 +29,17 @@
   (add-to-list 'default-frame-alist '(alpha . (85 . 50)))
 
 ;;Uncomment for no transparency
- ;; (set-frame-parameter (selected-frame) 'alpha '(100 . 50))
- ;;  (add-to-list 'default-frame-alist '(alpha . (100 . 50)))
+ (set-frame-parameter (selected-frame) 'alpha '(100 . 50))
+  (add-to-list 'default-frame-alist '(alpha . (100 . 50)))
 
 (column-number-mode)
 (global-display-line-numbers-mode t)
+(setq display-line-numbers-type 'relative)
 (dolist (mode '(org-mode-hook
-	        term-mode-hook
-	        vterm-mode-hook
-		shell-mode-hook
-	        eshell-mode-hook))
+                term-mode-hook
+                vterm-mode-hook
+                shell-mode-hook
+                eshell-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
 (use-package ivy
@@ -89,36 +90,46 @@
 
 ;; note that you need to run M-x all-the-icons-install-fonts when first installed
 (use-package all-the-icons)
-  
+
 (use-package doom-modeline
   :ensure t
   :init (doom-modeline-mode 1)
-  :config (display-battery-mode 1)
+  :config
+  (setq doom-modeline-icon t)
+  (display-battery-mode 1)
   :custom (doom-modline-height 10))
 
 (use-package doom-themes)
 (use-package cyberpunk-theme)
 (use-package catppuccin-theme)
 ;; (load-theme 'doom-laserwave t)         ; Awesome Fucking lasers
+(load-theme 'doom-gruvbox t)           ; Gruvbox
 ;; (load-theme 'everblush t)
-;; (load-theme 'ewal-spacemacs-classic t)
+;; (load-theme 'ewal-doom-one t)
 
-(use-package xresources-theme)
-(load-theme 'xresources t)
+;; (use-package xresources-theme)
+;; (load-theme 'xresources t)
 
 (use-package ewal
   :init (setq ewal-use-built-in-always-p nil
               ewal-use-built-in-on-failure-p t
-              ewal-built-in-palette "sexy-material")
-  :if (not window-system)
-  :config
-  (setq-default mode-line-format nil))
+              ewal-built-in-palette "sexy-material"))
+  ;; :if (not window-system)
+  ;; :config
+  ;; (setq-default mode-line-format nil))
 
-(use-package ewal-spacemacs-themes
+(use-package ewal-doom-themes
     :if window-system
     :init (progn
             (show-paren-mode +1)
             (global-hl-line-mode)))
+
+(defun reload-theme ()
+  (interactive)
+  (load-theme 'ewal-doom-one t)
+  (set-face-attribute 'org-block nil :foreground nil :background (ewal-load-color 'background +1) :inherit 'fixed-pitch)
+  (set-face-attribute 'org-block-begin-line nil :foreground nil :background (ewal-load-color 'background +1) :inherit 'fixed-pitch)
+  (set-face-attribute 'org-block-end-line nil :foreground nil :background (ewal-load-color 'background +1) :inherit 'fixed-pitch))
 
 (use-package magit
   :custom (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
@@ -133,14 +144,27 @@
     :global-prefix "C-SPC"))
 
 (cur/leader-keys
+  "s"   '(swiper :which-key "toggles")
+  ;; Togling
   "t"   '(:ignore t :which-key "toggles")
   "tt"  '(counsel-load-theme :which-key "choose theme")
-  "w"   '(:ignore t :which-key "windows")
+  ;; Buffers
   "b"   '(:ignore t :which-key "buffers")
   "bs"  '(kill-some-buffers :which-key "kill multiple buffers")
+  "bc"  '(kill-current-buffer :which-key "kill current buffer")
+  "bC"  '(kill-buffer :which-key "kill a buffer")
+  "bb"  '(counsel-ibuffer :which-key "switch buffer")
+  "bn"  '(next-buffer :which-key "next buffer")
+  "bp"  '(previous-buffer :which-key "previous buffer")
+  "bl"  '(ibuffer :which-key "list buffers")
+  "r"   '(:ignore t :which-key "reload")
+  "rt"  '(reload-theme :which-key "reload")
+  ;; Other stuff
   "g"   '(magit-status :which-key "magit")
   "f"   '(counsel-find-file :which-key "find or make file")
-  "RET" '(vterm :which-key "vterm-other-window"))
+  "RET" '(vterm :which-key "vterm"))
+
+
 
 (defun cur/evil-hook ()
   (dolist (mode '(custom-mode
@@ -178,6 +202,7 @@
 (use-package evil-collection
   :after evil
   :config
+  ;; (setq evil-collection-mode-list '(dashboard ibuffer))
   (evil-collection-init))
 
 (use-package hydra)
@@ -189,6 +214,55 @@
   ("f" nil "finished" :exit t))
 (cur/leader-keys
   "ts" '(hydra-text-scale/body :which-key "scale-text"))
+
+(general-define-key
+ "M-h" 'evil-window-left
+ "M-j" 'evil-window-down
+ "M-k" 'evil-window-up
+ "M-l" 'evil-window-right
+ "M-n" 'split-and-follow-horizontally
+ "M-m" 'split-and-follow-vertically
+ )
+
+(defun split-and-follow-horizontally ()
+  (interactive)
+  (split-window-below)
+  (balance-windows)
+  (other-window 1))
+
+(defun split-and-follow-vertically ()
+  (interactive)
+  (split-window-right)
+  (balance-windows)
+  (other-window 1))
+
+(defhydra cur/window-management (:hint nil)
+  ("c"  (delete-window) "delete window" :exit t)
+  ("h"  evil-window-left)
+  ("j"  evil-window-down)
+  ("k"  evil-window-up)
+  ("l"  evil-window-right)
+  ("o"  evil-window-next)
+  ("n"  split-and-follow-horizontally)
+  ("m"  split-and-follow-vertically)
+  ("RET" nil :exit t))
+(cur/leader-keys
+  "w" '(cur/window-management/body :which-key "window management"))
+
+(defun opacity-none ()
+    (interactive)
+  (set-frame-parameter (selected-frame) 'alpha '(100 . 50))
+  (add-to-list 'default-frame-alist '(alpha . (100 . 50))))
+
+(defun opacity-some ()
+    (interactive)
+  (set-frame-parameter (selected-frame) 'alpha '(85 . 50))
+  (add-to-list 'default-frame-alist '(alpha . (85 . 50))))
+
+(cur/leader-keys
+  "to" '(:ignore t :which-key "opacity")
+  "too" '(opacity-some :which-key "transparent background")
+  "ton" '(opacity-none :which-key "hard background"))
 
 (use-package projectile
   :diminish projectile-mode
@@ -203,7 +277,8 @@
 (cur/leader-keys
   "p"  '(:ignore t :which-key "projectile")
   "pp" '(projectile-dired :which-key "open project in dired")
-  "pf" '(projectile-switch-project :which-key "open project in dired"))
+  "pf" '(projectile-find-file :which-key "open a project's file")
+  "ps" '(projectile-switch-project :which-key "switch project"))
 
 (use-package counsel-projectile
  :after projectile
@@ -234,9 +309,10 @@
     (set-face-attribute (car face) nil :font "DejaVu Sans" :weight 'regular :height (cdr face)))
 
   ;; Ensure that anything that should be fixed-pitch in Org files appears that way
-  (set-face-attribute 'org-block nil :foreground nil :background "#232221" :inherit 'fixed-pitch)
-  (set-face-attribute 'org-block-begin-line nil :foreground nil :background "#232221" :inherit 'fixed-pitch)
-  (set-face-attribute 'org-block-end-line nil :foreground nil :background "#232221" :inherit 'fixed-pitch)
+  (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+  ;; (set-face-attribute 'org-block nil :foreground nil :background (ewal-load-color 'background +1) :inherit 'fixed-pitch)
+  ;; (set-face-attribute 'org-block-begin-line nil :foreground nil :background (ewal-load-color 'background +1) :inherit 'fixed-pitch)
+  ;; (set-face-attribute 'org-block-end-line nil :foreground nil :background (ewal-load-color 'background +1) :inherit 'fixed-pitch)
   (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
   (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
   (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
@@ -252,10 +328,10 @@
   (setq org-agenda-start-with-log-mode t)
   (setq org-log-done 'time)
   (setq org-log-into-drawer t)
-  
+
   (setq org-agenda-files
-	'("~/org/tasks.org"
-	  "~/org/completed.org"))
+        '("~/org/tasks.org"
+          "~/org/completed.org"))
 
   (setq org-agenda-start-with-log-mode t)
   (setq org-log-done 'time)
@@ -282,6 +358,21 @@
 (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
 (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
 (add-to-list 'org-structure-template-alist '("py" . "src python"))
+(add-to-list 'org-structure-template-alist '("tex" . "src latex"))
+
+(general-define-key
+ :key-maps 'org-mode
+ "C-S-J" 'outline-move-subtree-down
+ "C-S-K" 'outline-move-subtree-up
+ "C-S-H" 'outline-promote
+ "C-S-L" 'outline-demote
+ )
+(define-key org-mode-map (kbd "<normal-state> M-h") nil)
+(define-key org-mode-map (kbd "<normal-state> M-j") nil)
+(define-key org-mode-map (kbd "<normal-state> M-k") nil)
+(define-key org-mode-map (kbd "<normal-state> M-l") nil)
+(define-key org-mode-map (kbd "M-l") nil)
+(define-key org-mode-map (kbd "M-h") nil)
 
 (use-package vterm
   :commands vterm
@@ -294,12 +385,45 @@
 (setq sh-indentation 8)
 (setq-default c-basic-offset 8)
 
+(use-package beacon)
+(beacon-mode 1)
+
+(use-package dashboard
+  :ensure t
+  :config
+  (setq dashboard-startup-banner "~/.emacs.d/avatar.png")
+  (setq dashboard-banner-logo-title "\"I discovered freedom for the first time in England.\" - Emperor Hirohito")
+  (setq dashboard-items '((projects . 6)
+                          (bookmarks . 6)
+                          (recents  . 8)))
+  (dashboard-setup-startup-hook))
+(setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
+
 (use-package lsp-mode
   :commands (lsp lsp-deferred)
   :init
   (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
   :config
   (lsp-enable-which-key-integration t))
+
+(use-package web-mode
+  :ensure t
+  :config
+  (setq
+   web-mode-markup-indent-offset 2
+   web-mode-css-indent-offset 2
+   web-mode-code-indent-offset 2
+   web-mode-style-padding 2
+   web-mode-script-padding 2
+   web-mode-enable-auto-closing t
+   web-mode-enable-auto-opening t
+   web-mode-enable-auto-pairing t
+   web-mode-enable-auto-indentation t)
+  :mode
+  (".html$" "*.php$" "*.tsx"))
+
+(use-package emmet-mode
+  :ensure t)
 
 (use-package rust-mode)
 

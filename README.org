@@ -1,8 +1,8 @@
 #+TITLE: README
 
-* ReadMe
 This is my personal Emacs config. It is a work in progress. I use it as an my main text editor, as a piece of my goal management system, and generally as a productivity tool. My goal here is to keep it minimal, or at least as minimal as Emacs can really be. Right now my config is based off of SystemCrafters' [[https://github.com/daviwil/emacs-from-scratch][Emacs From Scratch]] guide, but I do not plan on keeping it like that for very long.
 
+* Features
 Here are a list of features I would like to implement:
 - [ ] Better Keybinding Layout
   - [ ] Flush out SPC leader-key
