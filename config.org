@@ -147,6 +147,8 @@
 
 ** General Themes
 #+begin_src emacs-lisp
+  (use-package autothemer
+    :ensure t)
   (use-package doom-themes)
   (use-package cyberpunk-theme)
   (use-package catppuccin-theme)

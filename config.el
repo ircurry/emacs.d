@@ -99,6 +99,8 @@
   (display-battery-mode 1)
   :custom (doom-modline-height 10))
 
+(use-package autothemer
+  :ensure t)
 (use-package doom-themes)
 (use-package cyberpunk-theme)
 (use-package catppuccin-theme)
@@ -392,7 +394,7 @@
   :ensure t
   :config
   (setq dashboard-startup-banner "~/.emacs.d/avatar.png")
-  (setq dashboard-banner-logo-title "\"I discovered freedom for the first time in England.\" - Emperor Hirohito")
+  ;; (setq dashboard-banner-logo-title "\"I discovered freedom for the first time in England.\" n - Emperor Hirohito")
   (setq dashboard-items '((projects . 6)
                           (bookmarks . 6)
                           (recents  . 8)))
