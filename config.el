@@ -105,9 +105,10 @@
 (use-package cyberpunk-theme)
 (use-package catppuccin-theme)
 ;; (load-theme 'doom-laserwave t)         ; Awesome Fucking lasers
-(load-theme 'doom-gruvbox t)           ; Gruvbox
+;; (load-theme 'doom-gruvbox t)           ; Gruvbox
 ;; (load-theme 'everblush t)
-;; (load-theme 'ewal-doom-one t)
+;; (load-theme 'catppuccin-mocha t)
+(load-theme 'ewal-doom-one t)
 
 ;; (use-package xresources-theme)
 ;; (load-theme 'xresources t)
@@ -394,11 +395,17 @@
   :ensure t
   :config
   (setq dashboard-startup-banner "~/.emacs.d/avatar.png")
-  ;; (setq dashboard-banner-logo-title "\"I discovered freedom for the first time in England.\" n - Emperor Hirohito")
+  (setq dashboard-banner-logo-title "")
   (setq dashboard-items '((projects . 6)
                           (bookmarks . 6)
                           (recents  . 8)))
-  (dashboard-setup-startup-hook))
+  (dashboard-setup-startup-hook)
+  (setq dashboard-footer-messages '("\"I discovered freedom for the first time in England.\" - Emperor Hirohito"))
+  ;; (setq dashboard-footer-icon (all-the-icons-octicon "ghost"
+  ;;                                              :height 1.1
+  ;;                                              :v-adjust -0.05
+  ;;                                              :face 'font-lock-keyword-face))
+  )
 (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
 
 (use-package lsp-mode
