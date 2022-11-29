@@ -36,8 +36,10 @@
 
 ** Fonts
 #+begin_src emacs-lisp
+  ;; (add-to-list 'default-frame-alist
+  ;;              '(font . "mono-11"))
   (add-to-list 'default-frame-alist
-               '(font . "mono-11"))
+               '(font . "Terminus-12"))
 #+end_src
 
 ** Opacity
@@ -156,6 +158,7 @@
   ;; (load-theme 'doom-gruvbox t)           ; Gruvbox
   ;; (load-theme 'everblush t)
   ;; (load-theme 'catppuccin-mocha t)
+  ;; (load-theme 'kanagawa t)
   (load-theme 'ewal-doom-one t)
 #+end_src
 
@@ -184,14 +187,46 @@
               (global-hl-line-mode)))
 #+end_src
 
-*** Reload Theme
+*** Theme Functions
+
+**** Reload Ewal Theme
 #+begin_src emacs-lisp
-  (defun reload-theme ()
+  (defun cur/reload-ewal-theme ()
     (interactive)
     (load-theme 'ewal-doom-one t)
     (set-face-attribute 'org-block nil :foreground nil :background (ewal-load-color 'background +1) :inherit 'fixed-pitch)
     (set-face-attribute 'org-block-begin-line nil :foreground nil :background (ewal-load-color 'background +1) :inherit 'fixed-pitch)
-    (set-face-attribute 'org-block-end-line nil :foreground nil :background (ewal-load-color 'background +1) :inherit 'fixed-pitch))
+    (set-face-attribute 'org-block-end-line nil :foreground nil :background (ewal-load-color 'background +1) :inherit 'fixed-pitch)
+    (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
+#+end_src
+
+**** Reset theme
+#+begin_src emacs-lisp
+  (defun cur/reset-theme ()
+    (interactive)
+    (set-face-attribute 'org-block nil :foreground nil :background nil :inherit 'fixed-pitch)
+    (set-face-attribute 'org-block-begin-line nil :foreground nil :background nil :inherit 'fixed-pitch)
+    (set-face-attribute 'org-block-end-line nil :foreground nil :background nil :inherit 'fixed-pitch)
+    (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+    (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+    (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
+#+end_src
+
+**** Set Theme
+#+begin_src emacs-lisp
+  (defun cur/set-theme ()
+    (interactive)
+    (cur/reset-theme)
+    (counsel-load-theme)
+    (cur/org-font-setup))
 #+end_src
 
 * Magit
@@ -221,7 +256,7 @@ Emacs, no life,  is worthless without Magit.
     "s"   '(swiper :which-key "toggles")
     ;; Togling
     "t"   '(:ignore t :which-key "toggles")
-    "tt"  '(counsel-load-theme :which-key "choose theme")
+    "tt"  '(cur/set-theme :which-key "choose theme")
     ;; Buffers
     "b"   '(:ignore t :which-key "buffers")
     "bs"  '(kill-some-buffers :which-key "kill multiple buffers")
@@ -232,7 +267,7 @@ Emacs, no life,  is worthless without Magit.
     "bp"  '(previous-buffer :which-key "previous buffer")
     "bl"  '(ibuffer :which-key "list buffers")
     "r"   '(:ignore t :which-key "reload")
-    "rt"  '(reload-theme :which-key "reload")
+    "rt"  '(cur/reload-ewal-theme :which-key "reload")
     ;; Other stuff
     "g"   '(magit-status :which-key "magit")
     "f"   '(counsel-find-file :which-key "find or make file")
@@ -402,14 +437,15 @@ I ripped these from [[https://bugswriter.com][bugswriter's]] config.
 *** Org-Setup-Hooks
 "#232221"
 #+begin_src emacs-lisp
-  (defun efs/org-mode-setup ()
+  (defun cur/org-mode-setup ()
     (org-indent-mode)
     (variable-pitch-mode 1)
     (visual-line-mode 1))
 
 
-  (defun efs/org-font-setup ()
+  (defun cur/org-font-setup ()
     ;; Replace list hyphen with dot
+    (interactive)
     (font-lock-add-keywords 'org-mode
                             '(("^ *\\([-]\\) "
                                (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
@@ -425,11 +461,20 @@ I ripped these from [[https://bugswriter.com][bugswriter's]] config.
                     (org-level-8 . 1.1)))
       (set-face-attribute (car face) nil :font "DejaVu Sans" :weight 'regular :height (cdr face)))
 
-    ;; Ensure that anything that should be fixed-pitch in Org files appears that way
-    (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+    ;; Ensure that anthing that should be fixed-pitch in Org files appears that way
     ;; (set-face-attribute 'org-block nil :foreground nil :background (ewal-load-color 'background +1) :inherit 'fixed-pitch)
     ;; (set-face-attribute 'org-block-begin-line nil :foreground nil :background (ewal-load-color 'background +1) :inherit 'fixed-pitch)
     ;; (set-face-attribute 'org-block-end-line nil :foreground nil :background (ewal-load-color 'background +1) :inherit 'fixed-pitch)
+
+    ;;; Reset Background ----------------------------------------
+    ;; (set-face-attribute 'org-block nil :foreground nil :background nil :inherit 'fixed-pitch)
+    ;; (set-face-attribute 'org-block-begin-line nil :foreground nil :background nil :inherit 'fixed-pitch)
+    ;; (set-face-attribute 'org-block-end-line nil :foreground nil :background nil :inherit 'fixed-pitch)
+    ;; ----------------------------------------------------------
+    
+    (set-face-attribute 'org-block nil :inherit 'fixed-pitch)
+    (set-face-attribute 'org-block-begin-line nil :inherit 'fixed-pitch)
+    (set-face-attribute 'org-block-end-line nil :inherit 'fixed-pitch)
     (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
     (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
     (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
@@ -441,7 +486,7 @@ I ripped these from [[https://bugswriter.com][bugswriter's]] config.
 *** Org
 #+begin_src emacs-lisp
   (use-package org
-    :hook (org-mode . efs/org-mode-setup)
+    :hook (org-mode . cur/org-mode-setup)
     :config
     (setq org-ellipsis " ▾")
 
@@ -457,7 +502,7 @@ I ripped these from [[https://bugswriter.com][bugswriter's]] config.
     (setq org-log-done 'time)
     (setq org-log-into-drawer t)
 
-    (efs/org-font-setup))
+    (cur/org-font-setup))
 #+end_src
 
 **** Org-Bullets
@@ -471,13 +516,13 @@ I ripped these from [[https://bugswriter.com][bugswriter's]] config.
 
 **** Visual Fill
 #+begin_src emacs-lisp
-  (defun efs/org-mode-visual-fill ()
+  (defun cur/org-mode-visual-fill ()
     (setq visual-fill-column-width 100
           visual-fill-column-center-text t)
     (visual-fill-column-mode 1))
 
   (use-package visual-fill-column
-    :hook (org-mode . efs/org-mode-visual-fill))
+    :hook (org-mode . cur/org-mode-visual-fill))
 #+end_src
 
 **** Org Tempo
@@ -505,6 +550,17 @@ I ripped these from [[https://bugswriter.com][bugswriter's]] config.
   (define-key org-mode-map (kbd "<normal-state> M-l") nil)
   (define-key org-mode-map (kbd "M-l") nil)
   (define-key org-mode-map (kbd "M-h") nil)
+#+end_src
+
+*** Custom Org Functions
+#+begin_src emacs-lisp
+  (defun cur/fix-org-fonts ()
+    (interactive)
+    (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+    (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+    (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
 #+end_src
 
 * Terminal Modes

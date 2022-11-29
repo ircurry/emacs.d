@@ -22,8 +22,10 @@
 (tooltip-mode -1)                   ;; Disable tooltips
 (set-fringe-mode 10)                ;; No idea what this does
 
+;; (add-to-list 'default-frame-alist
+;;              '(font . "mono-11"))
 (add-to-list 'default-frame-alist
-             '(font . "mono-11"))
+             '(font . "Terminus-12"))
 
 (set-frame-parameter (selected-frame) 'alpha '(85 . 50))
   (add-to-list 'default-frame-alist '(alpha . (85 . 50)))
@@ -108,6 +110,7 @@
 ;; (load-theme 'doom-gruvbox t)           ; Gruvbox
 ;; (load-theme 'everblush t)
 ;; (load-theme 'catppuccin-mocha t)
+;; (load-theme 'kanagawa t)
 (load-theme 'ewal-doom-one t)
 
 ;; (use-package xresources-theme)
@@ -127,12 +130,36 @@
             (show-paren-mode +1)
             (global-hl-line-mode)))
 
-(defun reload-theme ()
+(defun cur/reload-ewal-theme ()
   (interactive)
   (load-theme 'ewal-doom-one t)
   (set-face-attribute 'org-block nil :foreground nil :background (ewal-load-color 'background +1) :inherit 'fixed-pitch)
   (set-face-attribute 'org-block-begin-line nil :foreground nil :background (ewal-load-color 'background +1) :inherit 'fixed-pitch)
-  (set-face-attribute 'org-block-end-line nil :foreground nil :background (ewal-load-color 'background +1) :inherit 'fixed-pitch))
+  (set-face-attribute 'org-block-end-line nil :foreground nil :background (ewal-load-color 'background +1) :inherit 'fixed-pitch)
+  (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+(set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
+(set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+(set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+(set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+(set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
+
+(defun cur/reset-theme ()
+  (interactive)
+  (set-face-attribute 'org-block nil :foreground nil :background nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-block-begin-line nil :foreground nil :background nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-block-end-line nil :foreground nil :background nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
+
+(defun cur/set-theme ()
+  (interactive)
+  (cur/reset-theme)
+  (counsel-load-theme)
+  (cur/org-font-setup))
 
 (use-package magit
   :custom (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
@@ -150,7 +177,7 @@
   "s"   '(swiper :which-key "toggles")
   ;; Togling
   "t"   '(:ignore t :which-key "toggles")
-  "tt"  '(counsel-load-theme :which-key "choose theme")
+  "tt"  '(cur/set-theme :which-key "choose theme")
   ;; Buffers
   "b"   '(:ignore t :which-key "buffers")
   "bs"  '(kill-some-buffers :which-key "kill multiple buffers")
@@ -161,7 +188,7 @@
   "bp"  '(previous-buffer :which-key "previous buffer")
   "bl"  '(ibuffer :which-key "list buffers")
   "r"   '(:ignore t :which-key "reload")
-  "rt"  '(reload-theme :which-key "reload")
+  "rt"  '(cur/reload-ewal-theme :which-key "reload")
   ;; Other stuff
   "g"   '(magit-status :which-key "magit")
   "f"   '(counsel-find-file :which-key "find or make file")
@@ -288,14 +315,15 @@
  :config
  (counsel-projectile-mode 1))
 
-(defun efs/org-mode-setup ()
+(defun cur/org-mode-setup ()
   (org-indent-mode)
   (variable-pitch-mode 1)
   (visual-line-mode 1))
 
 
-(defun efs/org-font-setup ()
+(defun cur/org-font-setup ()
   ;; Replace list hyphen with dot
+  (interactive)
   (font-lock-add-keywords 'org-mode
                           '(("^ *\\([-]\\) "
                              (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
@@ -311,11 +339,20 @@
                   (org-level-8 . 1.1)))
     (set-face-attribute (car face) nil :font "DejaVu Sans" :weight 'regular :height (cdr face)))
 
-  ;; Ensure that anything that should be fixed-pitch in Org files appears that way
-  (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+  ;; Ensure that anthing that should be fixed-pitch in Org files appears that way
   ;; (set-face-attribute 'org-block nil :foreground nil :background (ewal-load-color 'background +1) :inherit 'fixed-pitch)
   ;; (set-face-attribute 'org-block-begin-line nil :foreground nil :background (ewal-load-color 'background +1) :inherit 'fixed-pitch)
   ;; (set-face-attribute 'org-block-end-line nil :foreground nil :background (ewal-load-color 'background +1) :inherit 'fixed-pitch)
+
+  ;;; Reset Background ----------------------------------------
+  ;; (set-face-attribute 'org-block nil :foreground nil :background nil :inherit 'fixed-pitch)
+  ;; (set-face-attribute 'org-block-begin-line nil :foreground nil :background nil :inherit 'fixed-pitch)
+  ;; (set-face-attribute 'org-block-end-line nil :foreground nil :background nil :inherit 'fixed-pitch)
+  ;; ----------------------------------------------------------
+
+  (set-face-attribute 'org-block nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-block-begin-line nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-block-end-line nil :inherit 'fixed-pitch)
   (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
   (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
   (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
@@ -324,7 +361,7 @@
   (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
 
 (use-package org
-  :hook (org-mode . efs/org-mode-setup)
+  :hook (org-mode . cur/org-mode-setup)
   :config
   (setq org-ellipsis " ▾")
 
@@ -340,7 +377,7 @@
   (setq org-log-done 'time)
   (setq org-log-into-drawer t)
 
-  (efs/org-font-setup))
+  (cur/org-font-setup))
 
 (use-package org-bullets
   :after org
@@ -348,13 +385,13 @@
   :custom
   (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
 
-(defun efs/org-mode-visual-fill ()
+(defun cur/org-mode-visual-fill ()
   (setq visual-fill-column-width 100
         visual-fill-column-center-text t)
   (visual-fill-column-mode 1))
 
 (use-package visual-fill-column
-  :hook (org-mode . efs/org-mode-visual-fill))
+  :hook (org-mode . cur/org-mode-visual-fill))
 
 (require 'org-tempo)
 
@@ -376,6 +413,14 @@
 (define-key org-mode-map (kbd "<normal-state> M-l") nil)
 (define-key org-mode-map (kbd "M-l") nil)
 (define-key org-mode-map (kbd "M-h") nil)
+
+(defun cur/fix-org-fonts ()
+  (interactive)
+  (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
 
 (use-package vterm
   :commands vterm
