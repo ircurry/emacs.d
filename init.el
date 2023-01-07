@@ -7,7 +7,7 @@
  '(custom-safe-themes
    '("ba72dfc6bb260a9d8609136b9166e04ad0292b9760a3e2431cf0cd0679f83c3a" "89d9dc6f4e9a024737fb8840259c5dd0a140fd440f5ed17b596be43a05d62e67" "1a1ac598737d0fcdc4dfab3af3d6f46ab2d5048b8e72bc22f50271fd6d393a00" "636b135e4b7c86ac41375da39ade929e2bd6439de8901f53f88fde7dd5ac3561" "683b3fe1689da78a4e64d3ddfce90f2c19eb2d8ab1bab1738a63d8263119c3f4" "991ca4dbb23cab4f45c1463c187ac80de9e6a718edc8640003892a2523cb6259" "51c71bb27bdab69b505d9bf71c99864051b37ac3de531d91fdad1598ad247138" "0d2882cc7dbb37de573f14fdf53472bcfb4ec76e3d2f20c9a93a7b2fe1677bf5" "e3daa8f18440301f3e54f2093fe15f4fe951986a8628e98dcd781efbec7a46f2" default))
  '(package-selected-packages
-   '(autothemer ewal-doom-themes emmet-mode web-mode beacon rust-mode lsp-mode vterm ewal auto-package-update evil-magit magit counsel-projectile projectile evil-collection evil general all-the-icons catppuccin-theme cyberpunk-theme doom-themes helpful counsel ivy-rich rainbow-delimiters rainbow-delimeters doom-modeline ivy use-package)))
+   '(yaml-mode nord-theme autothemer ewal-doom-themes emmet-mode web-mode beacon rust-mode lsp-mode vterm ewal auto-package-update evil-magit magit counsel-projectile projectile evil-collection evil general all-the-icons catppuccin-theme cyberpunk-theme doom-themes helpful counsel ivy-rich rainbow-delimiters rainbow-delimeters doom-modeline ivy use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

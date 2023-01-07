@@ -106,12 +106,13 @@
 (use-package doom-themes)
 (use-package cyberpunk-theme)
 (use-package catppuccin-theme)
+;; (load-theme 'doom-henna)
 ;; (load-theme 'doom-laserwave t)         ; Awesome Fucking lasers
-;; (load-theme 'doom-gruvbox t)           ; Gruvbox
+(load-theme 'doom-gruvbox t)           ; Gruvbox
 ;; (load-theme 'everblush t)
 ;; (load-theme 'catppuccin-mocha t)
 ;; (load-theme 'kanagawa t)
-(load-theme 'ewal-doom-one t)
+;; (load-theme 'ewal-doom-one t)
 
 ;; (use-package xresources-theme)
 ;; (load-theme 'xresources t)
@@ -178,6 +179,7 @@
   ;; Togling
   "t"   '(:ignore t :which-key "toggles")
   "tt"  '(cur/set-theme :which-key "choose theme")
+  "tr"  '(cur/reload-ewal-theme :which-key "reload theme")
   ;; Buffers
   "b"   '(:ignore t :which-key "buffers")
   "bs"  '(kill-some-buffers :which-key "kill multiple buffers")
@@ -187,12 +189,12 @@
   "bn"  '(next-buffer :which-key "next buffer")
   "bp"  '(previous-buffer :which-key "previous buffer")
   "bl"  '(ibuffer :which-key "list buffers")
-  "r"   '(:ignore t :which-key "reload")
-  "rt"  '(cur/reload-ewal-theme :which-key "reload")
+  "r"   '(:ignore t :which-key "org-roam")
   ;; Other stuff
   "g"   '(magit-status :which-key "magit")
   "f"   '(counsel-find-file :which-key "find or make file")
-  "RET" '(vterm :which-key "vterm"))
+  "RET" '(vterm-other-window :which-key "vterm")
+  "S-<return>" '(vterm :which-key "vterm-full-screen"))
 
 
 
@@ -217,7 +219,7 @@
   :hook (evil-mode . cur/evil-hook)
   :config
   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
-  (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join) 
+  ;; (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join) 
 
   ;; Use visual line motions even outside of visual-line-mode buffers
   (evil-global-set-key 'motion "j" 'evil-next-visual-line)
@@ -370,12 +372,15 @@
   (setq org-log-into-drawer t)
 
   (setq org-agenda-files
-        '("~/org/tasks.org"
+        '("~/org/todo.org"
+          "~/org/projects.org"
           "~/org/completed.org"))
 
   (setq org-agenda-start-with-log-mode t)
   (setq org-log-done 'time)
   (setq org-log-into-drawer t)
+
+  (setq org-format-latex-options '(:foreground "#e5e9e9" :scale 3.0))
 
   (cur/org-font-setup))
 
@@ -395,10 +400,14 @@
 
 (require 'org-tempo)
 
+(push '("conf-unix" . conf-unix) org-src-lang-modes)
+
 (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
 (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
 (add-to-list 'org-structure-template-alist '("py" . "src python"))
 (add-to-list 'org-structure-template-alist '("tex" . "src latex"))
+(add-to-list 'org-structure-template-alist '("conf" . "src conf-unix"))
+(add-to-list 'org-structure-template-alist '("yaml" . "src yaml"))
 
 (general-define-key
  :key-maps 'org-mode
@@ -413,6 +422,29 @@
 (define-key org-mode-map (kbd "<normal-state> M-l") nil)
 (define-key org-mode-map (kbd "M-l") nil)
 (define-key org-mode-map (kbd "M-h") nil)
+
+(defun cur/org-checkboxes-next-check ()
+  (interactive)
+  (org-toggle-checkbox)
+  (evil-next-visual-line))
+
+(defhydra cur/org-checkboxes (:hint nil)
+      ("RET" org-insert-todo-heading)
+      ("h" evil-forward-char)
+      ("j" evil-next-visual-line)
+      ("k" evil-previous-visual-line)
+      ("l" evil-forward-char)
+      ("c" cur/org-checkboxes-next-check)
+      ("f" nil :exit t))
+
+(cur/leader-keys
+  "o"  '(:ignore t :which-key "org")
+  "ot" '(org-todo :which-key "org-todo")
+  "oc" '(cur/org-checkboxes/body :which-key "checkboxes"))
+
+(setq org-todo-keywords
+  '((sequence "TODO(t)" "NEXT(n)" "WAIT(w)" "|" "DONE(d!)")
+    (sequence "PLANNING(p)" "BACKLOG(b)" "ONBOARD(o)" "REVIEW(v)" "HOLD(h)" "|" "COMPLETED(c)" "CANC(k@)")))
 
 (defun cur/fix-org-fonts ()
   (interactive)
@@ -452,6 +484,8 @@
   ;;                                              :face 'font-lock-keyword-face))
   )
 (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
+(cur/leader-keys
+  "C-d" '(dashboard-refresh-buffer :which-key "open dashboard"))
 
 (use-package lsp-mode
   :commands (lsp lsp-deferred)
@@ -478,6 +512,8 @@
 
 (use-package emmet-mode
   :ensure t)
+
+(use-package yaml-mode)
 
 (use-package rust-mode)
 
